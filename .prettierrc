@@ -17,6 +17,12 @@
       }
     },
     {
+      "files": "**/*.apex",
+      "options": {
+        "tabWidth": 4
+      }
+    },
+    {
       "files": ["**/*.xml", "**/*.meta.xml"],
       "options": {
         "parser": "xml",
