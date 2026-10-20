@@ -27,9 +27,6 @@ public without sharing class OrderTriggerHandler {
             when AFTER_UNDELETE {
                 addAccountIds((List<Order__c>) Trigger.new, affectedAccountIds);
             }
-            when else {
-                return;
-            }
         }
 
         recalculateOrderCounts(affectedAccountIds);
