@@ -50,4 +50,47 @@ public with sharing class OrderFilterController {
 
         return monthKeys;
     }
+
+    /**
+     * Returns a list of available Order__c's for a given Account and date (year-month), sorted by date.
+     */
+    @AuraEnabled(cacheable=true)
+    public static List<Order__c> getOrdersForAccountAndMonth(Id accountId, String monthKey) {
+        if (accountId == null || String.isBlank(monthKey)) {
+            return new List<Order__c>();
+        }
+
+        if (monthKey.length() != 7 || monthKey.substring(4, 5) != '-') {
+            throw new AuraHandledException('Invalid month selection.');
+        }
+
+        Integer yearValue;
+        Integer monthValue;
+
+        try {
+            yearValue = Integer.valueOf(monthKey.substring(0, 4));
+            monthValue = Integer.valueOf(monthKey.substring(5, 7));
+        } catch (Exception e) {
+            throw new AuraHandledException('Invalid month selection.');
+        }
+
+        if (yearValue < 1700 || yearValue > 4000 || monthValue < 1 || monthValue > 12) {
+            throw new AuraHandledException('Invalid month selection.');
+        }
+
+        Date monthStart = Date.newInstance(yearValue, monthValue, 1);
+
+        Date nextMonthStart = monthStart.addMonths(1);
+
+        return [
+            SELECT Id, Name, Account__c, Payment_Due_Date__c, Total_Amount__c
+            FROM Order__c
+            WHERE
+                Account__c = :accountId
+                AND Payment_Due_Date__c >= :monthStart
+                AND Payment_Due_Date__c < :nextMonthStart
+            WITH USER_MODE
+            ORDER BY Payment_Due_Date__c ASC, Name ASC
+        ];
+    }
 }
