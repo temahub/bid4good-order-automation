@@ -36,8 +36,8 @@ private class OrderFilterControllerTest {
         List<Account> accounts = OrderFilterController.getAccountsWithOrders();
         Test.stopTest();
 
-        System.assertEquals(2, accounts.size(), 'Should return exactly 2 accounts with orders.');
-        System.assertEquals('B Multi Month Account', accounts[0].Name, 'Accounts must be sorted by Name ASC.');
+        Assert.areEqual(2, accounts.size(), 'Should return exactly 2 accounts with orders.');
+        Assert.areEqual('B Multi Month Account', accounts[0].Name, 'Accounts must be sorted by Name ASC.');
     }
 
     // GIVEN: An Account with orders in different months, an Account without orders, and a null Account ID.
@@ -54,11 +54,11 @@ private class OrderFilterControllerTest {
         List<String> monthsNull = OrderFilterController.getAvailableMonthKeys(null);
         Test.stopTest();
 
-        System.assertEquals(2, monthsMulti.size(), 'Should return two distinct month keys.');
-        System.assert(!monthsMulti.isEmpty(), 'Month keys should not be empty.');
+        Assert.areEqual(2, monthsMulti.size(), 'Should return two distinct month keys.');
+        Assert.isTrue(!monthsMulti.isEmpty(), 'Month keys should not be empty.');
 
-        System.assert(monthsEmpty.isEmpty(), 'Account with no orders should return an empty list.');
-        System.assert(monthsNull.isEmpty(), 'Null accountId should return an empty list.');
+        Assert.isTrue(monthsEmpty.isEmpty(), 'Account with no orders should return an empty list.');
+        Assert.isTrue(monthsNull.isEmpty(), 'Null accountId should return an empty list.');
     }
 
     // GIVEN: An Account with orders in different years.
@@ -72,8 +72,8 @@ private class OrderFilterControllerTest {
         List<String> monthKeys = OrderFilterController.getAvailableMonthKeys(multiYearAcc.Id);
         Test.stopTest();
 
-        System.assertEquals(2, monthKeys.size(), 'Should return 2 keys across different years.');
-        System.assertEquals('2024-10', monthKeys[0], 'Should include October 2024.');
+        Assert.areEqual(2, monthKeys.size(), 'Should return 2 keys across different years.');
+        Assert.areEqual('2024-10', monthKeys[0], 'Should include October 2024.');
     }
 
     // GIVEN: An Account with multiple orders across different months.
@@ -87,7 +87,7 @@ private class OrderFilterControllerTest {
         List<Order__c> orders = OrderFilterController.getOrdersForAccountAndMonth(multiMonthAcc.Id, '2025-03');
         Test.stopTest();
 
-        System.assert(!orders.isEmpty(), 'Should return orders for March 2025.');
+        Assert.isTrue(!orders.isEmpty(), 'Should return orders for March 2025.');
     }
 
     // GIVEN: An Account ID and null or empty monthKey parameters.
@@ -102,8 +102,8 @@ private class OrderFilterControllerTest {
         List<Order__c> ordersBlank = OrderFilterController.getOrdersForAccountAndMonth(acc.Id, '');
         Test.stopTest();
 
-        System.assert(ordersNull.isEmpty(), 'Null Account ID should return an empty list.');
-        System.assert(ordersBlank.isEmpty(), 'Blank month key should return an empty list.');
+        Assert.isTrue(ordersNull.isEmpty(), 'Null Account ID should return an empty list.');
+        Assert.isTrue(ordersBlank.isEmpty(), 'Blank month key should return an empty list.');
     }
 
     // GIVEN: A monthKey with an invalid string length (not 7 characters).
@@ -122,7 +122,7 @@ private class OrderFilterControllerTest {
         }
         Test.stopTest();
 
-        System.assert(exceptionThrown, 'Should throw exception for invalid string length.');
+        Assert.isTrue(exceptionThrown, 'Should throw exception for invalid string length.');
     }
 
     // GIVEN: A monthKey missing a hyphen at the 5th character position.
@@ -141,7 +141,7 @@ private class OrderFilterControllerTest {
         }
         Test.stopTest();
 
-        System.assert(exceptionThrown, 'Should throw exception for missing hyphen delimiter.');
+        Assert.isTrue(exceptionThrown, 'Should throw exception for missing hyphen delimiter.');
     }
 
     // GIVEN: A monthKey containing non-numeric values.
@@ -160,7 +160,7 @@ private class OrderFilterControllerTest {
         }
         Test.stopTest();
 
-        System.assert(exceptionThrown, 'Should throw exception for non-numeric month key values.');
+        Assert.isTrue(exceptionThrown, 'Should throw exception for non-numeric month key values.');
     }
 
     // GIVEN: A monthKey containing a year before 1700.
@@ -179,7 +179,7 @@ private class OrderFilterControllerTest {
         }
         Test.stopTest();
 
-        System.assert(exceptionThrown, 'Should throw exception for year outside allowed range (< 1700).');
+        Assert.isTrue(exceptionThrown, 'Should throw exception for year outside allowed range (< 1700).');
     }
 
     // GIVEN: A monthKey containing a month value greater than 12.
@@ -198,6 +198,6 @@ private class OrderFilterControllerTest {
         }
         Test.stopTest();
 
-        System.assert(exceptionThrown, 'Should throw exception for month outside valid range (> 12).');
+        Assert.isTrue(exceptionThrown, 'Should throw exception for month outside valid range (> 12).');
     }
 }
