@@ -67,6 +67,12 @@ public with sharing class OrderEmailService {
 
         outgoingEmail.setToAddresses(new List<String>{ recipientEmail });
 
+        List<OrgWideEmailAddress> owea = [SELECT Id FROM OrgWideEmailAddress LIMIT 1];
+
+        if (!owea.isEmpty()) {
+            outgoingEmail.setOrgWideEmailAddressId(owea[0].Id);
+        }
+
         outgoingEmail.setSubject(renderedMessage.getSubject());
 
         if (String.isNotBlank(renderedMessage.getHtmlBody())) {
