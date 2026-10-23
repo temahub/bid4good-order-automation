@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <fullName>JetBI_Logo_Public_URL</fullName>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>JetBI Logo Public URL</shortDescription>
+    <value>
+      https://orgfarm-4bf08db940-dev-ed.develop.file.force.com/sfc/dist/version/download/?oid=00Dg800000OeRCY &amp; ids=068g8000009LIXp &amp; d=%2Fa%2Fg80000006Scj%2FKL9JXA0ozOZTCp5ZaTXbYHjFCmqXum6BqnpOAT4dfjU &amp; asPdf=false
+    </value>
+  </labels>
+</CustomLabels>
