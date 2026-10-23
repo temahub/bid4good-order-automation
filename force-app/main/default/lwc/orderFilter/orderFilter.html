@@ -1,0 +1,77 @@
+<template>
+  <div class="slds-container_x-large slds-container_left">
+    <lightning-card title="Bid4Good — Order Automation" icon-name="standard:orders">
+      <div class="slds-var-p-around_medium">
+        <template lwc:if={errorMessage}>
+          <div class="slds-text-color_error slds-var-m-bottom_medium" role="alert">{errorMessage}</div>
+        </template>
+
+        <div class="slds-grid slds-wrap slds-gutters">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-var-m-bottom_medium">
+            <lightning-combobox
+              name="account"
+              label="Account"
+              value={selectedAccountId}
+              options={accountOptions}
+              placeholder="Select an Account"
+              onchange={handleAccountChange}
+              disabled={isAccountDisabled}
+              required></lightning-combobox>
+          </div>
+
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-var-m-bottom_medium">
+            <lightning-combobox
+              name="month"
+              label="Payment Due Month / Year"
+              value={selectedMonthKey}
+              options={monthOptions}
+              placeholder="Select a month"
+              onchange={handleMonthChange}
+              disabled={isMonthDisabled}
+              required></lightning-combobox>
+          </div>
+        </div>
+
+        <template lwc:if={noAccountsFound}>
+          <p class="slds-text-color_weak">No Accounts with related Orders were found.</p>
+        </template>
+
+        <template lwc:if={noMonthsFound}>
+          <p class="slds-text-color_weak">No Payment Due Date months were found for this Account.</p>
+        </template>
+
+        <template lwc:if={hasSelection}>
+          <div class="slds-var-m-top_medium">
+            <h2 class="slds-text-heading_medium slds-var-m-bottom_small">Orders</h2>
+
+            <template lwc:if={ordersError}>
+              <p class="slds-text-color_error">Unable to load Orders.</p>
+            </template>
+
+            <template lwc:elseif={showTable}>
+              <lightning-datatable
+                key-field="Id"
+                data={orderRows}
+                columns={columns}
+                hide-checkbox-column></lightning-datatable>
+            </template>
+
+            <template lwc:elseif={showNoOrdersMessage}>
+              <p class="slds-text-color_weak">No Orders found for the selected Account and month.</p>
+            </template>
+
+            <template lwc:else>
+              <lightning-spinner alternative-text="Loading Orders" size="small"></lightning-spinner>
+            </template>
+          </div>
+        </template>
+
+        <template lwc:else>
+          <p class="slds-text-color_weak slds-var-m-top_medium">
+            Select an Account and a month to view the related Orders.
+          </p>
+        </template>
+      </div>
+    </lightning-card>
+  </div>
+</template>
