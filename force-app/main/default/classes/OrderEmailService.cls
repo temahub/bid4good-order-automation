@@ -1,5 +1,6 @@
 public with sharing class OrderEmailService {
     private static final String TEMPLATE_DEVELOPER_NAME = 'Bid4Good_Order_Email';
+    private static final String SENDER_ADDRESS = 'artyom.jalilov@outlook.com';
 
     @AuraEnabled
     public static void sendOrderEmail(Id orderId) {
@@ -67,11 +68,18 @@ public with sharing class OrderEmailService {
 
         outgoingEmail.setToAddresses(new List<String>{ recipientEmail });
 
-        List<OrgWideEmailAddress> owea = [SELECT Id FROM OrgWideEmailAddress LIMIT 1];
+        List<OrgWideEmailAddress> owea = [
+            SELECT Id, Address
+            FROM OrgWideEmailAddress
+            WHERE Address = :SENDER_ADDRESS
+            LIMIT 1
+        ];
 
-        if (!owea.isEmpty()) {
-            outgoingEmail.setOrgWideEmailAddressId(owea[0].Id);
+        if (owea.isEmpty()) {
+            throw new AuraHandledException('The configured Bid4Good sender address was not found.');
         }
+
+        outgoingEmail.setOrgWideEmailAddressId(owea[0].Id);
 
         outgoingEmail.setSubject(renderedMessage.getSubject());
 
