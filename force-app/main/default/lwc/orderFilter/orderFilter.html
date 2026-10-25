@@ -6,6 +6,12 @@
           <div class="slds-text-color_error slds-var-m-bottom_medium" role="alert">{errorMessage}</div>
         </template>
 
+        <template lwc:if={cdcSubscriptionError}>
+          <div class="slds-notify slds-notify_alert slds-alert_warning slds-var-m-bottom_medium" role="status">
+            Real-time updates are unavailable: {cdcSubscriptionError}
+          </div>
+        </template>
+
         <div class="slds-grid slds-wrap slds-gutters">
           <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-var-m-bottom_medium">
             <lightning-combobox

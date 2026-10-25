@@ -30,7 +30,7 @@
                                             src="{!$Label.JetBI_Logo_Public_URL}"
                                             alt="JetBI"
                                             width="220"
-                                            height="108"
+                                            height="103"
                                             style="display: block; width: 100%; max-width: 220px; height: auto; border: 0;"
                                         />
                                     </td>
