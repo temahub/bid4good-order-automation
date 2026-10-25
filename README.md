@@ -1,6 +1,6 @@
 # Bid4Good Order Automation
 
-A Salesforce DX learning project that automates order-count aggregation, provides an Account/month-based order explorer, and sends order notification emails from an Order record.
+A Salesforce DX learning project that automates order-count aggregation, provides an Account/month-based custom order explorer, and sends order notification emails from an Order__c record.
 
 > **Project context:** Created as a Salesforce Developer course final assignment. Email delivery and real-time updates depend on org-level configuration described below.
 
@@ -9,9 +9,9 @@ A Salesforce DX learning project that automates order-count aggregation, provide
 The project includes:
 
 - A custom `Order__c` object related to `Account` through an optional Lookup.
-- An Apex trigger and handler that maintain `Account.Total_Orders_Count__c` after Order insert, reassignment, deletion, and undelete.
+- An Apex trigger and handler that maintain `Account.Total_Orders_Count__c` after Order__c insert, reassignment, deletion, and undelete.
 - A Lightning Web Component (LWC) with Account and Payment Due Month/Year filters and a clickable orders table.
-- Change Data Capture (CDC) subscriptions for Account and Order changes, refreshing the wired Apex data without a manual browser refresh. Supports CDC-based refresh when enabled and configured in the org.
+- Change Data Capture (CDC) subscriptions for Account and Order__c changes, refreshing the wired Apex data without a manual browser refresh. Supports CDC-based refresh when enabled and configured in the org.
 - A `Send Order` Lightning Web Component Quick Action that renders a Visualforce Email Template and sends the order details to the current Salesforce user.
 - Test-data utilities and an Anonymous Apex seed script for local demonstration.
 
@@ -63,10 +63,10 @@ flowchart TD
 `OrderTrigger` delegates to `OrderTriggerHandler`. The handler recalculates counts in bulk and accounts for:
 
 - `after insert`
-- `after update` when `Account` changes
+- `after update` when `Account__c` changes
 - `after delete`
 - `after undelete`
-- Orders with a null `Account`
+- Orders with a null `Account__c`
 - Accounts whose last related Order is removed
 
 ### Lightning Web Component
