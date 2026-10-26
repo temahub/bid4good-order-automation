@@ -1,6 +1,6 @@
 public with sharing class OrderEmailService {
     private static final String TEMPLATE_DEVELOPER_NAME = 'Bid4Good_Order_Email';
-    private static final String SENDER_ADDRESS = 'artyom.jalilov@outlook.com';
+    private static final String SENDER_ADDRESS = 'artyom.jalilov@wp.pl';
 
     @AuraEnabled
     public static void sendOrderEmail(Id orderId) {
