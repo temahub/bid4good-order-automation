@@ -10,6 +10,10 @@
  * development/demo org, and do not use these Account names for real data.
  *
  * Order__c.Name is assumed to be Auto Number, so it is intentionally omitted.
+ * 
+ * sf apex run \
+  --file scripts/apex/seedData.apex \
+  --target-org bid4good-dev
  */
 
 List<String> seedAccountNames = new List<String>{
