@@ -1,6 +1,7 @@
 public with sharing class OrderFilterController {
     /**
-     * Returns a list of Accounts, each of which contains at least one Order__c.
+     * @description Returns a list of Accounts, each of which contains at least one Order__c.
+     * @return List<Account> List of Account records matching the criteria.
      */
     @AuraEnabled(cacheable=true)
     public static List<Account> getAccountsWithOrders() {
@@ -19,7 +20,9 @@ public with sharing class OrderFilterController {
     }
 
     /**
-     * Returns a list of available Order__c's dates (in YYYY-MM format) for the specified Account Id.
+     * @description Returns a list of available Order__c's dates (in YYYY-MM format) for the specified Account Id.
+     * @param accountId Id of the selected Account.
+     * @return List<String> List of formatted month keys in YYYY-MM format.
      */
     @AuraEnabled(cacheable=true)
     public static List<String> getAvailableMonthKeys(Id accountId) {
@@ -52,7 +55,10 @@ public with sharing class OrderFilterController {
     }
 
     /**
-     * Returns a list of available Order__c's for a given Account and date (year-month), sorted by date.
+     * @description Returns a list of available Order__c's for a given Account and date (year-month), sorted by date.
+     * @param accountId Id of the selected Account.
+     * @param monthKey Selected month in YYYY-MM format.
+     * @return List<Order__c> List of Order__c records for the specified account and month.
      */
     @AuraEnabled(cacheable=true)
     public static List<Order__c> getOrdersForAccountAndMonth(Id accountId, String monthKey) {
