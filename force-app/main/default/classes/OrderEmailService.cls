@@ -1,7 +1,14 @@
+/**
+ * @description Service class responsible for rendering and sending order confirmation emails.
+ */
 public with sharing class OrderEmailService {
     private static final String TEMPLATE_DEVELOPER_NAME = 'Bid4Good_Order_Email';
     private static final String SENDER_ADDRESS = 'artyom.jalilov@wp.pl';
 
+    /**
+     * @description Renders the Visualforce email template for a specific Order and sends it to the current user.
+     * @param orderId Id of the Order__c record to send the email for.
+     */
     @AuraEnabled
     public static void sendOrderEmail(Id orderId) {
         if (orderId == null) {
