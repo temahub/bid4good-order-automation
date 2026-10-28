@@ -3,7 +3,7 @@
  */
 public with sharing class OrderEmailService {
     private static final String TEMPLATE_DEVELOPER_NAME = 'Bid4Good_Order_Email';
-    private static final String SENDER_ADDRESS = 'artyom.jalilov@wp.pl';
+    private static final String DISPLAY_NAME = 'Bid4Good Notifications';
 
     /**
      * @description Renders the Visualforce email template for a specific Order and sends it to the current user.
@@ -78,7 +78,7 @@ public with sharing class OrderEmailService {
         List<OrgWideEmailAddress> owea = [
             SELECT Id, Address
             FROM OrgWideEmailAddress
-            WHERE Address = :SENDER_ADDRESS
+            WHERE DisplayName = :DISPLAY_NAME
             LIMIT 1
         ];
 
