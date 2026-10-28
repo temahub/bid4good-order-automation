@@ -5,6 +5,9 @@ public with sharing class OrderEmailService {
     private static final String TEMPLATE_DEVELOPER_NAME = 'Bid4Good_Order_Email';
     private static final String DISPLAY_NAME = 'Bid4Good Notifications';
 
+    @TestVisible
+    private static List<Messaging.SendEmailResult> sendEmailResultsOverride;
+
     /**
      * @description Renders the Visualforce email template for a specific Order and sends it to the current user.
      * @param orderId Id of the Order__c record to send the email for.
@@ -101,10 +104,13 @@ public with sharing class OrderEmailService {
         outgoingEmail.setSaveAsActivity(false);
         outgoingEmail.setUseSignature(false);
 
-        Messaging.SendEmailResult[] results = Messaging.sendEmail(
-            new List<Messaging.SingleEmailMessage>{ outgoingEmail },
-            false
-        );
+        List<Messaging.SendEmailResult> results;
+
+        if (Test.isRunningTest() && sendEmailResultsOverride != null) {
+            results = sendEmailResultsOverride;
+        } else {
+            results = Messaging.sendEmail(new List<Messaging.SingleEmailMessage>{ outgoingEmail }, false);
+        }
 
         if (results.isEmpty() || !results[0].isSuccess()) {
             String errorMessage = 'Salesforce could not queue the email.';
