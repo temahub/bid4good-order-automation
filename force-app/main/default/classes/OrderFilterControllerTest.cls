@@ -1,5 +1,12 @@
+/**
+ * @description Unit test class for OrderFilterController, verifying account filtering,
+ * available month keys extraction, and order retrieval with rigorous edge-case handling.
+ */
 @isTest
 private class OrderFilterControllerTest {
+    /**
+     * @description Sets up test data including accounts with/without orders and multi-year order distributions.
+     */
     @TestSetup
     static void makeData() {
         // Account with no Order__c's, for negative scenarios
@@ -27,11 +34,14 @@ private class OrderFilterControllerTest {
         update multiYearOrder;
     }
 
-    // GIVEN: Accounts exist in the system, with and without related Order__c records.
-    // WHEN: getAccountsWithOrders is invoked.
-    // THEN: Returns only Accounts that have at least one Order__c, sorted by Name ASC.
+    /**
+     * @description Verifies that getAccountsWithOrders returns only accounts containing at least one order, sorted by Name ASC.
+     */
     @isTest
     static void testGetAccountsWithOrders() {
+        // GIVEN: Accounts exist in the system, with and without related Order__c records.
+        // WHEN: getAccountsWithOrders is invoked.
+        // THEN: Returns only Accounts that have at least one Order__c, sorted by Name ASC.
         Test.startTest();
         List<Account> accounts = OrderFilterController.getAccountsWithOrders();
         Test.stopTest();
@@ -40,11 +50,15 @@ private class OrderFilterControllerTest {
         Assert.areEqual('B Multi Month Account', accounts[0].Name, 'Accounts must be sorted by Name ASC.');
     }
 
-    // GIVEN: An Account with orders in different months, an Account without orders, and a null Account ID.
-    // WHEN: getAvailableMonthKeys is invoked for each case.
-    // THEN: Returns distinct YYYY-MM formatted keys for the Account with orders, and empty lists for others.
+    /**
+     * @description Verifies that getAvailableMonthKeys returns distinct YYYY-MM formatted keys for active accounts,
+     * and empty lists for empty or null accounts.
+     */
     @isTest
     static void testGetAvailableMonthKeys() {
+        // GIVEN: An Account with orders in different months, an Account without orders, and a null Account ID.
+        // WHEN: getAvailableMonthKeys is invoked for each case.
+        // THEN: Returns distinct YYYY-MM formatted keys for the Account with orders, and empty lists for others.
         Account multiMonthAcc = [SELECT Id FROM Account WHERE Name = 'B Multi Month Account' LIMIT 1];
         Account emptyAcc = [SELECT Id FROM Account WHERE Name = 'A Empty Account' LIMIT 1];
 
@@ -61,11 +75,14 @@ private class OrderFilterControllerTest {
         Assert.isTrue(monthsNull.isEmpty(), 'Null accountId should return an empty list.');
     }
 
-    // GIVEN: An Account with orders in different years.
-    // WHEN: getAvailableMonthKeys is invoked.
-    // THEN: Returns distinct month keys for each year-month combination.
+    /**
+     * @description Verifies that getAvailableMonthKeys correctly aggregates month keys across multiple years.
+     */
     @isTest
     static void testGetAvailableMonthKeys_MultiYear() {
+        // GIVEN: An Account with orders in different years.
+        // WHEN: getAvailableMonthKeys is invoked.
+        // THEN: Returns distinct month keys for each year-month combination.
         Account multiYearAcc = [SELECT Id FROM Account WHERE Name = 'C Multi Year Account' LIMIT 1];
 
         Test.startTest();
@@ -76,11 +93,14 @@ private class OrderFilterControllerTest {
         Assert.areEqual('2024-10', monthKeys[0], 'Should include October 2024.');
     }
 
-    // GIVEN: An Account with multiple orders across different months.
-    // WHEN: getOrdersForAccountAndMonth is invoked with a valid Account ID and month key.
-    // THEN: Returns only Order__c records falling within that specific year and month.
+    /**
+     * @description Verifies that getOrdersForAccountAndMonth filters orders correctly by account and month.
+     */
     @isTest
     static void testGetOrdersForAccountAndMonth() {
+        // GIVEN: An Account with multiple orders across different months.
+        // WHEN: getOrdersForAccountAndMonth is invoked with a valid Account ID and month key.
+        // THEN: Returns only Order__c records falling within that specific year and month.
         Account multiMonthAcc = [SELECT Id FROM Account WHERE Name = 'B Multi Month Account' LIMIT 1];
 
         Test.startTest();
@@ -90,11 +110,14 @@ private class OrderFilterControllerTest {
         Assert.isTrue(!orders.isEmpty(), 'Should return orders for March 2025.');
     }
 
-    // GIVEN: An Account ID and null or empty monthKey parameters.
-    // WHEN: getOrdersForAccountAndMonth is invoked.
-    // THEN: Returns an empty list of Order__c records without throwing an exception.
+    /**
+     * @description Verifies that passing null or blank parameters to getOrdersForAccountAndMonth returns an empty list.
+     */
     @isTest
     static void testGetOrdersForAccountAndMonth_NullOrBlankInput() {
+        // GIVEN: An Account ID and null or empty monthKey parameters.
+        // WHEN: getOrdersForAccountAndMonth is invoked.
+        // THEN: Returns an empty list of Order__c records without throwing an exception.
         Account acc = [SELECT Id FROM Account LIMIT 1];
 
         Test.startTest();
@@ -106,11 +129,14 @@ private class OrderFilterControllerTest {
         Assert.isTrue(ordersBlank.isEmpty(), 'Blank month key should return an empty list.');
     }
 
-    // GIVEN: A monthKey with an invalid string length (not 7 characters).
-    // WHEN: getOrdersForAccountAndMonth is invoked.
-    // THEN: Throws an AuraHandledException with invalid month selection message.
+    /**
+     * @description Verifies that an invalid monthKey length throws an AuraHandledException.
+     */
     @isTest
     static void testGetOrdersForAccountAndMonth_InvalidLength() {
+        // GIVEN: A monthKey with an invalid string length (not 7 characters).
+        // WHEN: getOrdersForAccountAndMonth is invoked.
+        // THEN: Throws an AuraHandledException with invalid month selection message.
         Account acc = [SELECT Id FROM Account LIMIT 1];
 
         Test.startTest();
@@ -125,11 +151,14 @@ private class OrderFilterControllerTest {
         Assert.isTrue(exceptionThrown, 'Should throw exception for invalid string length.');
     }
 
-    // GIVEN: A monthKey missing a hyphen at the 5th character position.
-    // WHEN: getOrdersForAccountAndMonth is invoked.
-    // THEN: Throws an AuraHandledException.
+    /**
+     * @description Verifies that a missing hyphen delimiter in monthKey throws an AuraHandledException.
+     */
     @isTest
     static void testGetOrdersForAccountAndMonth_MissingHyphenDelimiter() {
+        // GIVEN: A monthKey missing a hyphen at the 5th character position.
+        // WHEN: getOrdersForAccountAndMonth is invoked.
+        // THEN: Throws an AuraHandledException.
         Account acc = [SELECT Id FROM Account LIMIT 1];
 
         Test.startTest();
@@ -144,11 +173,14 @@ private class OrderFilterControllerTest {
         Assert.isTrue(exceptionThrown, 'Should throw exception for missing hyphen delimiter.');
     }
 
-    // GIVEN: A monthKey containing non-numeric values.
-    // WHEN: getOrdersForAccountAndMonth is invoked.
-    // THEN: Throws an AuraHandledException upon failing number conversion.
+    /**
+     * @description Verifies that non-numeric characters in monthKey throw an AuraHandledException.
+     */
     @isTest
     static void testGetOrdersForAccountAndMonth_NonNumericValues() {
+        // GIVEN: A monthKey containing non-numeric values.
+        // WHEN: getOrdersForAccountAndMonth is invoked.
+        // THEN: Throws an AuraHandledException upon failing number conversion.
         Account acc = [SELECT Id FROM Account LIMIT 1];
 
         Test.startTest();
@@ -163,11 +195,14 @@ private class OrderFilterControllerTest {
         Assert.isTrue(exceptionThrown, 'Should throw exception for non-numeric month key values.');
     }
 
-    // GIVEN: A monthKey containing a year before 1700.
-    // WHEN: getOrdersForAccountAndMonth is invoked.
-    // THEN: Throws an AuraHandledException due to year being out of acceptable range.
+    /**
+     * @description Verifies that a year out of acceptable range throws an AuraHandledException.
+     */
     @isTest
     static void testGetOrdersForAccountAndMonth_YearOutOfRange() {
+        // GIVEN: A monthKey containing a year before 1700.
+        // WHEN: getOrdersForAccountAndMonth is invoked.
+        // THEN: Throws an AuraHandledException due to year being out of acceptable range.
         Account acc = [SELECT Id FROM Account LIMIT 1];
 
         Test.startTest();
@@ -182,11 +217,14 @@ private class OrderFilterControllerTest {
         Assert.isTrue(exceptionThrown, 'Should throw exception for year outside allowed range (< 1700).');
     }
 
-    // GIVEN: A monthKey containing a month value greater than 12.
-    // WHEN: getOrdersForAccountAndMonth is invoked.
-    // THEN: Throws an AuraHandledException due to invalid month number.
+    /**
+     * @description Verifies that a month number greater than 12 throws an AuraHandledException.
+     */
     @isTest
     static void testGetOrdersForAccountAndMonth_MonthOutOfRange() {
+        // GIVEN: A monthKey containing a month value greater than 12.
+        // WHEN: getOrdersForAccountAndMonth is invoked.
+        // THEN: Throws an AuraHandledException due to invalid month number.
         Account acc = [SELECT Id FROM Account LIMIT 1];
 
         Test.startTest();
