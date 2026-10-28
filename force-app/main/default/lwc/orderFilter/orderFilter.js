@@ -49,6 +49,10 @@ const COLUMNS = [
   }
 ];
 
+/**
+ * @description Lightning Web Component for filtering and displaying orders by Account and Month,
+ * featuring real-time data synchronization via Salesforce Change Data Capture (CDC).
+ */
 export default class OrderFilter extends LightningElement {
   columns = COLUMNS;
 
@@ -81,6 +85,10 @@ export default class OrderFilter extends LightningElement {
   cdcSubscriptionError;
   refreshError;
 
+  /**
+   * Lifecycle hook executed when the component is inserted into the DOM.
+   * Registers error listeners and initiates real-time CDC subscriptions.
+   */
   connectedCallback() {
     this.registerEmpApiErrorListener();
 
@@ -89,6 +97,10 @@ export default class OrderFilter extends LightningElement {
     });
   }
 
+  /**
+   * Lifecycle hook executed when the component is removed from the DOM.
+   * Cleans up active debounce timers and unsubscribes from CDC channels.
+   */
   disconnectedCallback() {
     if (this.refreshTimer) {
       clearTimeout(this.refreshTimer);
@@ -106,6 +118,10 @@ export default class OrderFilter extends LightningElement {
     this.subscriptions = {};
   }
 
+  /**
+   * Registers a global error listener for the EMP API streaming service.
+   * Ensures the listener is registered only once across component instances.
+   */
   registerEmpApiErrorListener() {
     if (empApiErrorListenerRegistered) {
       return;
@@ -118,6 +134,11 @@ export default class OrderFilter extends LightningElement {
     empApiErrorListenerRegistered = true;
   }
 
+  /**
+   * Subscribes the component to a specified Change Data Capture (CDC) streaming channel.
+   * @param {string} channelName The full API name of the streaming channel.
+   * @returns {Promise<void>}
+   */
   async subscribeToChannel(channelName) {
     if (
       this.subscriptions[channelName] ||
@@ -163,6 +184,11 @@ export default class OrderFilter extends LightningElement {
     }
   }
 
+  /**
+   * Handles incoming Change Data Capture (CDC) messages and triggers a debounced refresh.
+   * @param {string} channelName The channel where the event occurred.
+   * @param {Object} message The payload delivered by the streaming channel.
+   */
   handleChangeEvent(channelName, message) {
     if (!this.isConnected) {
       return;
@@ -179,6 +205,9 @@ export default class OrderFilter extends LightningElement {
     this.scheduleDataRefresh();
   }
 
+  /**
+   * Schedules a debounced data refresh to batch rapid consecutive change events.
+   */
   scheduleDataRefresh() {
     if (this.refreshTimer) {
       clearTimeout(this.refreshTimer);
@@ -191,12 +220,22 @@ export default class OrderFilter extends LightningElement {
     }, REFRESH_DEBOUNCE_MS);
   }
 
+  /**
+   * Checks whether a wire service result object contains provisioned data or an error.
+   * @param {Object} result The wire adapter result object.
+   * @returns {boolean} True if data or error is present.
+   */
   hasProvisionedWireResult(result) {
     return Boolean(
       result && (result.data !== undefined || result.error !== undefined)
     );
   }
 
+  /**
+   * Asynchronously refreshes all active wire adapter caches using refreshApex.
+   * Manages re-entrance locks and pending refresh requests.
+   * @returns {Promise<void>}
+   */
   async refreshCurrentData() {
     if (!this.isConnected) {
       return;
@@ -246,10 +285,19 @@ export default class OrderFilter extends LightningElement {
     }
   }
 
+  /**
+   * Extracts a user-friendly error message from a standard LWC error object.
+   * @param {Object} error The error object caught during execution.
+   * @returns {string} Clean error description string.
+   */
   getErrorText(error) {
     return error?.body?.message || error?.message || 'Unknown error';
   }
 
+  /**
+   * Wire adapter to retrieve Accounts that have at least one associated Order.
+   * @param {Object} result Wire adapter result container holding data or error.
+   */
   @wire(getAccountsWithOrders)
   wiredAccounts(result) {
     this.wiredAccountsResult = result;
@@ -285,6 +333,10 @@ export default class OrderFilter extends LightningElement {
     }
   }
 
+  /**
+   * Wire adapter to fetch available order month keys for the selected Account.
+   * @param {Object} result Wire adapter result container.
+   */
   @wire(getAvailableMonthKeys, {
     accountId: '$selectedAccountId'
   })
@@ -319,6 +371,10 @@ export default class OrderFilter extends LightningElement {
     }
   }
 
+  /**
+   * Wire adapter to retrieve detailed Order records for the selected Account and month.
+   * @param {Object} result Wire adapter result container.
+   */
   @wire(getOrdersForAccountAndMonth, {
     accountId: '$selectedAccountId',
     monthKey: '$selectedMonthKey'
@@ -343,6 +399,11 @@ export default class OrderFilter extends LightningElement {
     }
   }
 
+  /**
+   * Handles user selection changes in the Account picklist.
+   * Resets dependent month and order state parameters.
+   * @param {CustomEvent} event Combobox change event.
+   */
   handleAccountChange(event) {
     this.selectedAccountId = event.detail.value;
 
@@ -359,6 +420,11 @@ export default class OrderFilter extends LightningElement {
     this.ordersError = undefined;
   }
 
+  /**
+   * Handles user selection changes in the Month picklist.
+   * Resets dependent order rows.
+   * @param {CustomEvent} event Combobox change event.
+   */
   handleMonthChange(event) {
     this.selectedMonthKey = event.detail.value;
 
@@ -367,6 +433,11 @@ export default class OrderFilter extends LightningElement {
     this.ordersError = undefined;
   }
 
+  /**
+   * Formats a raw YYYY-MM key into a human-readable localized month and year label.
+   * @param {string} monthKey Raw month string (e.g., '2026-10').
+   * @returns {string} Formatted label (e.g., 'October 2026').
+   */
   formatMonthLabel(monthKey) {
     const [year, month] = monthKey.split('-').map(Number);
 
@@ -376,10 +447,12 @@ export default class OrderFilter extends LightningElement {
     }).format(new Date(year, month - 1, 1));
   }
 
+  /** @returns {boolean} True if the account picklist should be disabled. */
   get isAccountDisabled() {
     return !this.accountsLoaded || this.accountOptions.length === 0;
   }
 
+  /** @returns {boolean} True if the month picklist should be disabled. */
   get isMonthDisabled() {
     return (
       !this.selectedAccountId ||
@@ -388,10 +461,12 @@ export default class OrderFilter extends LightningElement {
     );
   }
 
+  /** @returns {boolean} True if both Account and Month are currently selected. */
   get hasSelection() {
     return Boolean(this.selectedAccountId && this.selectedMonthKey);
   }
 
+  /** @returns {boolean} True if the accounts list loaded successfully but is empty. */
   get noAccountsFound() {
     return (
       this.accountsLoaded &&
@@ -400,6 +475,7 @@ export default class OrderFilter extends LightningElement {
     );
   }
 
+  /** @returns {boolean} True if the months list loaded successfully but is empty. */
   get noMonthsFound() {
     return (
       Boolean(this.selectedAccountId) &&
@@ -409,6 +485,7 @@ export default class OrderFilter extends LightningElement {
     );
   }
 
+  /** @returns {boolean} True if the orders data table should be rendered. */
   get showTable() {
     return (
       this.hasSelection &&
@@ -418,6 +495,7 @@ export default class OrderFilter extends LightningElement {
     );
   }
 
+  /** @returns {boolean} True if selection is complete but no orders were found. */
   get showNoOrdersMessage() {
     return (
       this.hasSelection &&
@@ -427,6 +505,7 @@ export default class OrderFilter extends LightningElement {
     );
   }
 
+  /** @returns {string|undefined} Combined error message string if any error occurred. */
   get errorMessage() {
     const error =
       this.accountsError ||
