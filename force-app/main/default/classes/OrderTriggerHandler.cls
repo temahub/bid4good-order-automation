@@ -1,4 +1,11 @@
+/**
+ * @description Trigger handler class for Order__c object. Recalculates total order counts on related Accounts.
+ */
 public without sharing class OrderTriggerHandler {
+    /**
+     * @description Main entry point for counting orders on Accounts. Handles AFTER_INSERT, AFTER_UPDATE,
+     * AFTER_DELETE, and AFTER_UNDELETE trigger contexts.
+     */
     public static void countOrdersOnAccount() {
         Set<Id> affectedAccountIds = new Set<Id>();
 
@@ -32,18 +39,33 @@ public without sharing class OrderTriggerHandler {
         recalculateOrderCounts(affectedAccountIds);
     }
 
+    /**
+     * @description Extracts non-null Account IDs from a list of Order__c records and adds them to a Set.
+     * @param orders List of Order__c records to inspect.
+     * @param accountIds Target Set where Account IDs will be collected.
+     */
     private static void addAccountIds(List<Order__c> orders, Set<Id> accountIds) {
         for (Order__c orderRecord : orders) {
             addAccountId(accountIds, orderRecord.Account__c);
         }
     }
 
+    /**
+     * @description Helper method to safely add a non-null Account ID to a Set.
+     * @param accountIds Target Set of Account IDs.
+     * @param accountId Account ID to validate and add.
+     */
     private static void addAccountId(Set<Id> accountIds, Id accountId) {
         if (accountId != null) {
             accountIds.add(accountId);
         }
     }
 
+    /**
+     * @description Queries the total count of Orders for each specified Account in SYSTEM_MODE
+     * and updates the Total_Orders_Count__c field on the Account records.
+     * @param accountIds Set of Account IDs whose order counts need recalculation.
+     */
     private static void recalculateOrderCounts(Set<Id> accountIds) {
         if (accountIds.isEmpty()) {
             return;
